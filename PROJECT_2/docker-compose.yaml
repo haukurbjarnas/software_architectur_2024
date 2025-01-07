@@ -1,0 +1,62 @@
+
+
+services:
+  buyer-service:
+    build: ./BuyerService
+    ports:
+      - "8002:8002"
+    volumes:
+      - ./BuyerService:/app
+      - ./BuyerService/data:/app/data
+  
+  merchant-service:
+    build: ./MerchantService
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./MerchantService:/app
+      - ./MerchantService/data:/app/data
+
+  inventory-service:
+    build: ./InventoryService
+    ports:
+      - "8003:8003"
+    volumes:
+      - ./InventoryService:/app
+      - ./InventoryService/data:/app/data 
+
+  order-service:
+    build: ./OrderService
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./OrderService:/app
+      - ./OrderService/data:/app/data
+    depends_on:
+      - rabbitmq
+
+  email-service:
+    build: ./EmailService
+    depends_on:
+      - rabbitmq
+      - order-service
+    volumes:
+      - ./EmailService:/app
+    env_file:
+      - ./EmailService/.env
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - "5672:5672"   
+      - "15672:15672" 
+
+volumes:
+  buyer-service-data:
+  inventory-service-data:
+  merchant-service-data:
+  order-service-data:
+
