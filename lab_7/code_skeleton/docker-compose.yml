@@ -1,0 +1,19 @@
+version: '3.8'
+services:
+  notflix-api:
+    build: .
+    image: notflix-api:latest
+    volumes:
+      - ./sqlite_data:/app/sqlite_data
+    env_file:
+      - .env
+    command: ["python", "startup.py"]
+
+  migration:
+      build: .
+      image: notflix-migration:latest
+      volumes:
+        - ./sqlite_data:/app/sqlite_data  
+      command: ["alembic", "upgrade", "head"] 
+      depends_on:
+        - notflix-api
